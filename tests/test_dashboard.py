@@ -16,7 +16,8 @@ class TestDashboard(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    # Skenario 5: [Positif] Buka Menu Admin
+    # --- POSITIVE TEST CASE ---
+    
     def test_01_navigasi_ke_menu_admin(self):
         self.login_page.login_as("Admin", "admin123")
         self.dashboard_page.click_admin_menu()
