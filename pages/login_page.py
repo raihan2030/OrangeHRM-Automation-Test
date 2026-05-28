@@ -19,7 +19,6 @@ class LoginPage(BasePage):
     def click_login(self):
         self.wait_for_clickable(self.LOGIN_BUTTON).click()
 
-    # Aksi gabungan agar tidak perlu mengetik 3 baris di file test
     def login_as(self, username, password):
         self.enter_username(username)
         self.enter_password(password)
