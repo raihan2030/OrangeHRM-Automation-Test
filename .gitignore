@@ -1,5 +1,7 @@
 env/
 __pycache__/
+pages/__pycache__/
+pages/__pycache__/
 *.pyc
 *.pyo
 *.pyd
