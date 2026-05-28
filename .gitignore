@@ -1,4 +1,8 @@
 env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 akses env.txt
 run tests command.txt
 test cases.txt
