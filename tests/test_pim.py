@@ -2,6 +2,7 @@ import unittest
 import time
 import os
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 from pages.pim_page import PIMPage
@@ -15,16 +16,38 @@ class TestPIM(unittest.TestCase):
         cls.invalid_pdf_path = os.path.abspath("dummy_invalid.pdf")
         cls.large_image_path = os.path.abspath("dummy_large.jpg")
         
-        # Buat file gambar kecil (1KB)
         with open(cls.valid_image_path, "wb") as f: f.write(os.urandom(1024))
-        # Buat file PDF
         with open(cls.invalid_pdf_path, "wb") as f: f.write(os.urandom(1024))
-        # Buat file gambar besar (> 1MB, misal 2MB)
         with open(cls.large_image_path, "wb") as f: f.write(os.urandom(2 * 1024 * 1024))
+
+        # --- SETUP PRASYARAT: Pastikan Employee ID 0024 ada ---
+        driver = webdriver.Chrome()
+        driver.maximize_window()
+        driver.get("https://opensource-demo.orangehrmlive.com/")
+        
+        login_page = LoginPage(driver)
+        dashboard_page = DashboardPage(driver)
+        pim_page = PIMPage(driver)
+        
+        login_page.login_as("Admin", "admin123")
+        dashboard_page.click_pim_menu()
+        
+        pim_page.search_by_employee_id("0024")
+        time.sleep(2)
+        
+        no_records = driver.find_elements(By.XPATH, "//span[text()='No Records Found']")
+        if len(no_records) > 0:
+            pim_page.click_add_button()
+            pim_page.enter_first_name("Kamen")
+            pim_page.enter_last_name("Rider")
+            pim_page.enter_employee_id_add("0024")
+            pim_page.click_save_button()
+            time.sleep(3)
+            
+        driver.quit()
 
     @classmethod
     def tearDownClass(cls):
-        # Bersihkan file dummy setelah semua test selesai
         for file in [cls.valid_image_path, cls.invalid_pdf_path, cls.large_image_path]:
             if os.path.exists(file):
                 os.remove(file)
@@ -48,7 +71,7 @@ class TestPIM(unittest.TestCase):
 
     def test_01_add_employee_valid(self):
         self.pim_page.click_add_button()
-        self.pim_page.enter_first_name("Raihan")
+        self.pim_page.enter_first_name("Zeztz")
         self.pim_page.enter_last_name("Automated")
         
         unique_id = f"ID{int(time.time())}"[-8:] 
@@ -91,7 +114,7 @@ class TestPIM(unittest.TestCase):
 
     def test_07_add_employee_empty_last_name(self):
         self.pim_page.click_add_button()
-        self.pim_page.enter_first_name("Raihan")
+        self.pim_page.enter_first_name("Zeztz")
         self.pim_page.click_save_button()
         self.assertEqual(self.pim_page.get_last_name_error_message(), "Required")
 

@@ -16,7 +16,7 @@ class PIMPage(BasePage):
     MIDDLE_NAME_INPUT = (By.NAME, "middleName")
     LAST_NAME_INPUT = (By.NAME, "lastName")
     EMPLOYEE_ID_ADD_INPUT = (By.XPATH, "//label[text()='Employee Id']/../following-sibling::div//input")
-    FILE_INPUT = (By.XPATH, "//input[@type='file']") # Input tersembunyi untuk upload file
+    FILE_INPUT = (By.XPATH, "//input[@type='file']")
     
     # Locators Pencarian (Employee List)
     EMPLOYEE_ID_SEARCH_INPUT = (By.XPATH, "//label[text()='Employee Id']/../following-sibling::div//input")
@@ -32,7 +32,7 @@ class PIMPage(BasePage):
     FIRST_NAME_ERROR = (By.XPATH, "//input[@name='firstName']/parent::div/following-sibling::span[contains(@class, 'oxd-input-field-error-message')]")
     LAST_NAME_ERROR = (By.XPATH, "//input[@name='lastName']/parent::div/following-sibling::span[contains(@class, 'oxd-input-field-error-message')]")
     EMPLOYEE_ID_ERROR = (By.XPATH, "//label[text()='Employee Id']/ancestor::div[contains(@class, 'oxd-input-group')]//span[contains(@class, 'oxd-input-field-error-message')]")
-    FILE_ERROR = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message')]") # Biasanya muncul di bawah kotak foto
+    FILE_ERROR = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message')]")
 
     # --- ACTIONS ---
     def click_add_button(self):

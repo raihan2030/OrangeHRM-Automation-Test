@@ -5,8 +5,10 @@ from pages.base_page import BasePage
 
 class AdminPage(BasePage):
     # --- LOCATORS ---
+    # Tombol Aksi Umum
     ADD_BUTTON = (By.XPATH, "//button[normalize-space()='Add']")
     SEARCH_BUTTON = (By.XPATH, "//button[normalize-space()='Search']")
+    SAVE_BUTTON = (By.XPATH, "//button[@type='submit']")
     
     # Locators Form Tambah/Cari User
     USERNAME_INPUT = (By.XPATH, "//label[text()='Username']/../following-sibling::div//input")
@@ -19,9 +21,13 @@ class AdminPage(BasePage):
     STATUS_DROPDOWN = (By.XPATH, "//label[text()='Status']/../following-sibling::div//i")
     DROPDOWN_OPTION_ADMIN = (By.XPATH, "//div[@role='listbox']//span[text()='Admin']")
     DROPDOWN_OPTION_ENABLED = (By.XPATH, "//div[@role='listbox']//span[text()='Enabled']")
+    DROPDOWN_OPTION_DISABLED = (By.XPATH, "//div[@role='listbox']//span[text()='Disabled']")
     AUTOCOMPLETE_FIRST_OPTION = (By.XPATH, "//div[@role='listbox']//span")
-    
-    SAVE_BUTTON = (By.XPATH, "//button[@type='submit']")
+
+    # Locators Tabel & Aksi (Edit/Hapus)
+    FIRST_EDIT_ICON = (By.XPATH, "(//i[contains(@class, 'bi-pencil')])[1]")
+    SECOND_TRASH_ICON = (By.XPATH, "(//i[contains(@class, 'bi-trash')])[2]")
+    CONFIRM_DELETE_BUTTON = (By.XPATH, "//button[normalize-space()='Yes, Delete']")
     
     # Locators Notifikasi & Error
     SUCCESS_TOAST = (By.XPATH, "//div[contains(@class, 'oxd-toast-content--success')]")
@@ -64,6 +70,21 @@ class AdminPage(BasePage):
     def search_by_username(self, username):
         self.wait_for_element(self.USERNAME_INPUT).send_keys(username)
         self.wait_for_clickable(self.SEARCH_BUTTON).click()
+
+    def click_search_button(self):
+        self.wait_for_clickable(self.SEARCH_BUTTON).click()
+
+    def select_status_disabled(self):
+        self.wait_for_clickable(self.STATUS_DROPDOWN).click()
+        self.wait_for_clickable(self.DROPDOWN_OPTION_DISABLED).click()
+
+    def edit_first_record(self):
+        self.wait_for_clickable(self.FIRST_EDIT_ICON).click()
+        self.wait.until(EC.url_contains("saveSystemUser"))
+        
+    def delete_second_record(self):
+        self.wait_for_clickable(self.SECOND_TRASH_ICON).click()
+        self.wait_for_clickable(self.CONFIRM_DELETE_BUTTON).click()
 
     # --- ASSERTIONS / GETTERS ---
     def is_success_toast_displayed(self):
