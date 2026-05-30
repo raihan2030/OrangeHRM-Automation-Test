@@ -51,7 +51,17 @@ class LeavePage(BasePage):
     DATE_ERROR_MSG = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message') and text()='To date should be after from date']")
     REQUIRED_ERROR_MSG = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message') and text()='Required']")
 
-    # --- ACTIONS (NAVIGASI) ---
+    # Tombol silang 'x' pada chip status 'Pending Approval' di Leave List
+    REMOVE_PENDING_CHIP = (By.XPATH, "//span[contains(text(), 'Pending Approval')]/following-sibling::i[contains(@class, 'oxd-chip-close')]")
+
+    # Navigasi Menu Configure & Leave Types
+    CONFIGURE_MENU = (By.XPATH, "//span[normalize-space()='Configure']")
+    LEAVE_TYPES_SUBMENU = (By.XPATH, "//a[normalize-space()='Leave Types']")
+    ADD_BUTTON_GENERAL = (By.XPATH, "//button[normalize-space()='Add']")
+    LEAVE_TYPE_NAME_INPUT = (By.XPATH, "//label[text()='Name']/../following-sibling::div//input")
+    LEAVE_TYPE_SAVE_BUTTON = (By.XPATH, "//button[@type='submit']")
+
+    # --- ACTIONS  ---
     def click_assign_leave_tab(self):
         self.wait_for_clickable(self.ASSIGN_LEAVE_TAB).click()
         time.sleep(1)
@@ -68,7 +78,6 @@ class LeavePage(BasePage):
         self.wait_for_clickable(self.MY_LEAVE_TAB).click()
         time.sleep(1)
 
-    # --- ACTIONS (INPUT DATA) ---
     def enter_employee_name(self, name_hint="a"):
         ele = self.wait_for_element(self.EMPLOYEE_NAME_INPUT)
         
@@ -102,7 +111,6 @@ class LeavePage(BasePage):
     def enter_comment(self, comment_text):
         self.wait_for_element(self.COMMENT_INPUT).send_keys(comment_text)
 
-    # --- ACTIONS (TOMBOL FORM) ---
     def click_assign_button(self):
         self.wait_for_clickable(self.ASSIGN_BUTTON).click()
 
@@ -117,7 +125,6 @@ class LeavePage(BasePage):
         self.wait_for_clickable(self.PENDING_APPROVAL_OPTION).click()
         self.force_unfocus()
 
-    # --- ACTIONS (ENTITLEMENTS & CANCEL) ---
     def click_add_entitlements_menu(self):
         self.wait_for_clickable(self.ENTITLEMENTS_MENU).click()
         self.wait_for_clickable(self.ADD_ENTITLEMENTS_SUBMENU).click()
@@ -138,7 +145,6 @@ class LeavePage(BasePage):
         self.wait_for_clickable(self.SAVE_BUTTON).click()
 
     def cancel_all_my_leaves(self):
-        """Membatalkan seluruh permohonan cuti yang masih bisa di-cancel"""
         while True:
             try:
                 wait_short = WebDriverWait(self.driver, 3)
@@ -178,6 +184,27 @@ class LeavePage(BasePage):
             
         except (TimeoutException, ElementClickInterceptedException) as e:
             pass
+
+    def remove_pending_approval_filter(self):
+        self.wait_for_clickable(self.REMOVE_PENDING_CHIP).click()
+
+    def navigate_to_leave_types(self):
+        self.wait_for_clickable(self.CONFIGURE_MENU).click()
+        self.wait_for_clickable(self.LEAVE_TYPES_SUBMENU).click()
+        time.sleep(1)
+
+    def click_add_button_general(self):
+        self.wait_for_clickable(self.ADD_BUTTON_GENERAL).click()
+
+    def enter_leave_type_name(self, name):
+        ele = self.wait_for_element(self.LEAVE_TYPE_NAME_INPUT)
+        ele.send_keys(Keys.CONTROL + "a")
+        ele.send_keys(Keys.BACKSPACE)
+        if name:
+            ele.send_keys(name)
+
+    def click_leave_type_save(self):
+        self.wait_for_clickable(self.LEAVE_TYPE_SAVE_BUTTON).click()
 
     # --- HELPER & POPUPS ---
     def _handle_popup(self, locator, timeout=3):

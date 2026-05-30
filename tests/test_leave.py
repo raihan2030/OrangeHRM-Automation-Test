@@ -53,7 +53,6 @@ class TestLeave(unittest.TestCase):
         pim_page.enter_last_name(cls.dummy_last_name)
         pim_page.enter_employee_id_add(cls.dummy_emp_id)
         pim_page.click_save_button()
-        time.sleep(3)
         
         dashboard_page.click_leave_menu()
         leave_page.click_my_leave_tab()
@@ -133,7 +132,7 @@ class TestLeave(unittest.TestCase):
     # --- HELPER METHODS ---
     
     def get_date(self, days_offset=0):
-        return (datetime.now() + timedelta(days=days_offset)).strftime("%Y-%d-%m")
+        return (datetime.now() + timedelta(days=days_offset)).strftime("%Y-%m-%d")
 
     def fill_assign_leave(self, from_offset, to_offset, comment=""):
         self.leave_page.click_assign_leave_tab()
@@ -176,7 +175,19 @@ class TestLeave(unittest.TestCase):
         self.leave_page.click_leave_list_tab()
         self.leave_page.select_status_pending_approval()
         self.leave_page.click_search_button()
-        time.sleep(2) 
+        time.sleep(2)
+    
+    def test_13_add_leave_type_success(self):
+        self.leave_page.navigate_to_leave_types()
+        self.leave_page.click_add_button_general()
+        
+        unique_leave_type = f"LType_{int(time.time())}"
+        self.leave_page.enter_leave_type_name(unique_leave_type)
+        
+        self.leave_page.click_leave_type_save()
+        time.sleep(2)
+        
+        self.assertTrue(self.leave_page.is_success_toast_displayed())
 
     # --- NEGATIVE TEST CASES ---
 
@@ -229,4 +240,23 @@ class TestLeave(unittest.TestCase):
         time.sleep(1)
         
         self.leave_page.click_apply_button()
+        self.assertTrue(self.leave_page.is_required_error_displayed())
+
+    def test_12_filter_leave_without_status_required(self):
+        self.leave_page.click_leave_list_tab()
+        
+        self.leave_page.remove_pending_approval_filter()
+        self.leave_page.click_search_button()
+        time.sleep(1)
+        
+        self.assertTrue(self.leave_page.is_required_error_displayed())
+
+    def test_14_add_leave_type_empty_name_required(self):
+        self.leave_page.navigate_to_leave_types()
+        self.leave_page.click_add_button_general()
+        
+        self.leave_page.enter_leave_type_name("")
+        self.leave_page.click_leave_type_save()
+        time.sleep(1)
+        
         self.assertTrue(self.leave_page.is_required_error_displayed())
