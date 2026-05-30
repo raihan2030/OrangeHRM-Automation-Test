@@ -11,6 +11,8 @@ class LeavePage(BasePage):
     # Tab Navigasi
     ASSIGN_LEAVE_TAB = (By.XPATH, "//a[normalize-space()='Assign Leave']")
     LEAVE_LIST_TAB = (By.XPATH, "//a[normalize-space()='Leave List']")
+    APPLY_TAB = (By.XPATH, "//a[normalize-space()='Apply']")
+    APPLY_BUTTON = (By.XPATH, "//button[normalize-space()='Apply']")
     
     # Locators Form Assign Leave
     EMPLOYEE_NAME_INPUT = (By.XPATH, "//label[text()='Employee Name']/../following-sibling::div//input")
@@ -41,6 +43,14 @@ class LeavePage(BasePage):
     ENTITLEMENT_INPUT = (By.XPATH, "//label[text()='Entitlement']/../following-sibling::div//input")
     SAVE_BUTTON = (By.XPATH, "//button[normalize-space()='Save']")
     CONFIRM_ENTITLEMENT_BUTTON = (By.XPATH, "//button[normalize-space()='Confirm']")
+    MY_LEAVE_TAB = (By.XPATH, "//a[normalize-space()='My Leave']")
+    CANCEL_BUTTON = (By.XPATH, "//button[normalize-space()='Cancel']")
+
+    CHECKBOX_ALL = (By.XPATH, "//div[contains(@class, 'oxd-table-header')]//i[contains(@class, 'oxd-checkbox-input-icon')]")
+    EMPLOYEE_ENTITLEMENTS_SUBMENU = (By.XPATH, "//a[normalize-space()='Employee Entitlements']")
+    CHECKBOX_MASTER = (By.XPATH, "//div[contains(@class, 'oxd-table-header')]//span[contains(@class, 'oxd-checkbox-input')]")
+    DELETE_SELECTED_BUTTON = (By.XPATH, "//button[normalize-space()='Delete Selected']")
+    CONFIRM_DELETE_BUTTON = (By.XPATH, "//button[normalize-space()='Yes, Delete']")
 
     # --- ACTIONS ---
     def click_assign_leave_tab(self):
@@ -127,6 +137,58 @@ class LeavePage(BasePage):
     def click_confirm_ok_popup_strict(self):
         """Mengklik tombol Ok pada pop-up. Tanpa try-except agar test gagal jika pop-up tidak muncul."""
         self.wait_for_clickable(self.CONFIRM_OK_BUTTON).click()
+
+    def click_apply_tab(self):
+        self.wait_for_clickable(self.APPLY_TAB).click()
+        time.sleep(1)
+
+    def click_apply_button(self):
+        self.wait_for_clickable(self.APPLY_BUTTON).click()
+
+    def click_my_leave_tab(self):
+        self.wait_for_clickable(self.MY_LEAVE_TAB).click()
+        time.sleep(1)
+
+    def cancel_all_my_leaves(self):
+        """Membatalkan seluruh permohonan cuti yang masih bisa di-cancel"""
+        while True:
+            try:
+                # Menggunakan timeout pendek agar pengujian cepat berlanjut jika tombol tidak ada
+                wait_short = WebDriverWait(self.driver, 3)
+                cancel_btn = wait_short.until(EC.element_to_be_clickable(self.CANCEL_BUTTON))
+                cancel_btn.click()
+                time.sleep(2) # Memberi jeda waktu proses pembatalan/toast info
+            except TimeoutException:
+                break
+
+    def click_employee_entitlements_menu(self):
+        self.wait_for_clickable(self.ENTITLEMENTS_MENU).click()
+        self.wait_for_clickable(self.EMPLOYEE_ENTITLEMENTS_SUBMENU).click()
+        time.sleep(1)
+
+    def delete_all_employee_entitlements(self):
+        """Menghapus massal menggunakan master checkbox"""
+        try:
+            wait_short = WebDriverWait(self.driver, 3)
+            
+            # 1. Klik Master Checkbox di Header Tabel
+            master_cb = wait_short.until(EC.element_to_be_clickable(self.CHECKBOX_MASTER))
+            master_cb.click()
+            time.sleep(1) # Tunggu tombol Delete Selected muncul
+            
+            # 2. Klik Delete Selected
+            del_selected = wait_short.until(EC.element_to_be_clickable(self.DELETE_SELECTED_BUTTON))
+            del_selected.click()
+            time.sleep(1)
+            
+            # 3. Konfirmasi
+            confirm_del = wait_short.until(EC.element_to_be_clickable(self.CONFIRM_DELETE_BUTTON))
+            confirm_del.click()
+            time.sleep(2)
+            
+        except TimeoutException:
+            # Masuk ke sini jika tabel kosong (Master Checkbox tidak ada)
+            pass
 
     # --- ASSERTIONS / GETTERS ---
     def is_success_toast_displayed(self):
