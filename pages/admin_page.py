@@ -98,3 +98,11 @@ class AdminPage(BasePage):
         
     def is_no_records_found_displayed(self):
         return self.wait_for_element(self.NO_RECORDS_MSG).is_displayed()
+    
+    def get_search_results_count(self):
+        records = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'oxd-table-body')]//div[contains(@class, 'oxd-table-card')]")
+        return len(records)
+
+    def get_first_record_column_text(self, col_index):
+        dynamic_xpath = f"(//div[contains(@class, 'oxd-table-card')])[1]//div[@role='cell'][{col_index}]/div"
+        return self.wait_for_element((By.XPATH, dynamic_xpath)).text

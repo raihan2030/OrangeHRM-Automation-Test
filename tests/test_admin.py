@@ -27,7 +27,14 @@ class TestAdmin(unittest.TestCase):
     def test_01_search_user_valid(self):
         self.admin_page.search_by_username("Admin")
         time.sleep(2) 
-        pass
+        
+        record_count = self.admin_page.get_search_results_count()
+        
+        if record_count > 0:
+            username = self.admin_page.get_first_record_column_text(2)
+            self.assertEqual(username, "Admin")
+        else:
+            self.assertTrue(self.admin_page.is_no_records_found_displayed())
 
     def test_02_add_user_success(self):
         self.admin_page.click_add_button()
@@ -49,13 +56,28 @@ class TestAdmin(unittest.TestCase):
         self.admin_page.wait_for_clickable(self.admin_page.DROPDOWN_OPTION_ADMIN).click()
         self.admin_page.click_search_button()
         time.sleep(2)
-        pass
+        
+        record_count = self.admin_page.get_search_results_count()
+        
+        if record_count > 0:
+            role = self.admin_page.get_first_record_column_text(3)
+            self.assertEqual(role, "Admin")
+        else:
+            self.assertTrue(self.admin_page.is_no_records_found_displayed())
 
     def test_04_search_user_by_employee_name(self):
         self.admin_page.enter_employee_name("a") 
         self.admin_page.click_search_button()
         time.sleep(2)
-        pass
+        
+        record_count = self.admin_page.get_search_results_count()
+        
+        if record_count > 0:
+            emp_name = self.admin_page.get_first_record_column_text(4)
+            self.assertTrue(len(emp_name) > 0)
+            self.assertIn("a", emp_name.lower())
+        else:
+            self.assertTrue(self.admin_page.is_no_records_found_displayed())
 
     def test_05_edit_user_status_disabled(self):
         self.admin_page.edit_first_record()
