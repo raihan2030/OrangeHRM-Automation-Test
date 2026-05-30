@@ -17,6 +17,8 @@ class MyInfoPage(BasePage):
     
     # Formulir Personal Details
     FIRST_NAME_INPUT = (By.NAME, "firstName")
+    MIDDLE_NAME_INPUT = (By.NAME, "middleName")
+    LAST_NAME_INPUT = (By.NAME, "lastName")
     
     # Locators Tombol Save & Attachments
     SAVE_BUTTON_MAIN = (By.XPATH, "(//button[@type='submit'])[1]")
@@ -59,6 +61,11 @@ class MyInfoPage(BasePage):
         ele.send_keys(Keys.BACKSPACE)
         time.sleep(1)
         ele.send_keys(Keys.TAB)
+    
+    def clear_middle_name(self):
+        ele = self.wait_for_element(self.MIDDLE_NAME_INPUT)
+        ele.send_keys(Keys.CONTROL + "a")
+        ele.send_keys(Keys.BACKSPACE)
 
     def click_save_main_form(self):
         self.wait_for_clickable(self.SAVE_BUTTON_MAIN).click()
@@ -76,6 +83,18 @@ class MyInfoPage(BasePage):
         save_btns = self.driver.find_elements(By.XPATH, "//button[@type='submit']")
         if save_btns:
             save_btns[-1].click()
+    
+    def enter_first_name(self, first_name):
+        ele = self.wait_for_element(self.FIRST_NAME_INPUT)
+        ele.send_keys(Keys.CONTROL + "a")
+        ele.send_keys(Keys.BACKSPACE)
+        ele.send_keys(first_name)
+
+    def enter_last_name(self, last_name):
+        ele = self.wait_for_element(self.LAST_NAME_INPUT)
+        ele.send_keys(Keys.CONTROL + "a")
+        ele.send_keys(Keys.BACKSPACE)
+        ele.send_keys(last_name)
 
     # --- ASSERTIONS / GETTERS ---
     def is_success_toast_displayed(self):
