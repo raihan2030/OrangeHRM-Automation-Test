@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from pages.base_page import BasePage
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
 
 class LeavePage(BasePage):
     # --- LOCATORS ---
@@ -12,9 +13,12 @@ class LeavePage(BasePage):
     ASSIGN_LEAVE_TAB = (By.XPATH, "//a[normalize-space()='Assign Leave']")
     LEAVE_LIST_TAB = (By.XPATH, "//a[normalize-space()='Leave List']")
     APPLY_TAB = (By.XPATH, "//a[normalize-space()='Apply']")
-    APPLY_BUTTON = (By.XPATH, "//button[normalize-space()='Apply']")
+    MY_LEAVE_TAB = (By.XPATH, "//a[normalize-space()='My Leave']")
     
-    # Locators Form Assign Leave
+    # Locators Form Cuti
+    APPLY_BUTTON = (By.XPATH, "//button[normalize-space()='Apply']")
+    ASSIGN_BUTTON = (By.XPATH, "//button[normalize-space()='Assign']")
+    CANCEL_BUTTON = (By.XPATH, "//button[normalize-space()='Cancel']")
     EMPLOYEE_NAME_INPUT = (By.XPATH, "//label[text()='Employee Name']/../following-sibling::div//input")
     EMPLOYEE_SUGGESTION = (By.XPATH, "//div[@role='listbox']//div[contains(@class, 'oxd-autocomplete-option')]")
     LEAVE_TYPE_DROPDOWN = (By.XPATH, "//label[text()='Leave Type']/../following-sibling::div//i")
@@ -22,7 +26,6 @@ class LeavePage(BasePage):
     FROM_DATE_INPUT = (By.XPATH, "//label[text()='From Date']/../following-sibling::div//input")
     TO_DATE_INPUT = (By.XPATH, "//label[text()='To Date']/../following-sibling::div//input")
     COMMENT_INPUT = (By.XPATH, "//label[text()='Comments']/../following-sibling::div//textarea")
-    ASSIGN_BUTTON = (By.XPATH, "//button[normalize-space()='Assign']")
     CONFIRM_OK_BUTTON = (By.XPATH, "//button[normalize-space()='Ok']")
     
     # Locators Form Leave List (Filter)
@@ -30,6 +33,17 @@ class LeavePage(BasePage):
     PENDING_APPROVAL_OPTION = (By.XPATH, "//div[@role='listbox']//span[text()='Pending Approval']")
     SEARCH_BUTTON = (By.XPATH, "//button[normalize-space()='Search']")
     
+    # Locators Menu Entitlements
+    ENTITLEMENTS_MENU = (By.XPATH, "//span[normalize-space()='Entitlements' or contains(text(), 'Entitlements')]")
+    ADD_ENTITLEMENTS_SUBMENU = (By.XPATH, "//a[normalize-space()='Add Entitlements']")
+    EMPLOYEE_ENTITLEMENTS_SUBMENU = (By.XPATH, "//a[normalize-space()='Employee Entitlements']")
+    ENTITLEMENT_INPUT = (By.XPATH, "//label[text()='Entitlement']/../following-sibling::div//input")
+    SAVE_BUTTON = (By.XPATH, "//button[normalize-space()='Save']")
+    CONFIRM_ENTITLEMENT_BUTTON = (By.XPATH, "//button[normalize-space()='Confirm']")
+    CHECKBOX_MASTER = (By.XPATH, "//div[contains(@class, 'oxd-table-header')]//span[contains(@class, 'oxd-checkbox-input')]")
+    DELETE_SELECTED_BUTTON = (By.XPATH, "//button[normalize-space()='Delete Selected']")
+    CONFIRM_DELETE_BUTTON = (By.XPATH, "//button[normalize-space()='Yes, Delete']")
+
     # Locators Pesan / Notifikasi
     SUCCESS_TOAST = (By.XPATH, "//div[contains(@class, 'oxd-toast-content--success')]")
     WARN_TOAST = (By.XPATH, "//div[contains(@class, 'oxd-toast-content--warn') or contains(@class, 'oxd-toast-content--error')]")     
@@ -37,22 +51,7 @@ class LeavePage(BasePage):
     DATE_ERROR_MSG = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message') and text()='To date should be after from date']")
     REQUIRED_ERROR_MSG = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message') and text()='Required']")
 
-    # Locators Menu Entitlements
-    ENTITLEMENTS_MENU = (By.XPATH, "//span[normalize-space()='Entitlements' or contains(text(), 'Entitlements')]")
-    ADD_ENTITLEMENTS_SUBMENU = (By.XPATH, "//a[normalize-space()='Add Entitlements']")
-    ENTITLEMENT_INPUT = (By.XPATH, "//label[text()='Entitlement']/../following-sibling::div//input")
-    SAVE_BUTTON = (By.XPATH, "//button[normalize-space()='Save']")
-    CONFIRM_ENTITLEMENT_BUTTON = (By.XPATH, "//button[normalize-space()='Confirm']")
-    MY_LEAVE_TAB = (By.XPATH, "//a[normalize-space()='My Leave']")
-    CANCEL_BUTTON = (By.XPATH, "//button[normalize-space()='Cancel']")
-
-    CHECKBOX_ALL = (By.XPATH, "//div[contains(@class, 'oxd-table-header')]//i[contains(@class, 'oxd-checkbox-input-icon')]")
-    EMPLOYEE_ENTITLEMENTS_SUBMENU = (By.XPATH, "//a[normalize-space()='Employee Entitlements']")
-    CHECKBOX_MASTER = (By.XPATH, "//div[contains(@class, 'oxd-table-header')]//span[contains(@class, 'oxd-checkbox-input')]")
-    DELETE_SELECTED_BUTTON = (By.XPATH, "//button[normalize-space()='Delete Selected']")
-    CONFIRM_DELETE_BUTTON = (By.XPATH, "//button[normalize-space()='Yes, Delete']")
-
-    # --- ACTIONS ---
+    # --- ACTIONS (NAVIGASI) ---
     def click_assign_leave_tab(self):
         self.wait_for_clickable(self.ASSIGN_LEAVE_TAB).click()
         time.sleep(1)
@@ -61,10 +60,25 @@ class LeavePage(BasePage):
         self.wait_for_clickable(self.LEAVE_LIST_TAB).click()
         time.sleep(1)
 
+    def click_apply_tab(self):
+        self.wait_for_clickable(self.APPLY_TAB).click()
+        time.sleep(1)
+
+    def click_my_leave_tab(self):
+        self.wait_for_clickable(self.MY_LEAVE_TAB).click()
+        time.sleep(1)
+
+    # --- ACTIONS (INPUT DATA) ---
     def enter_employee_name(self, name_hint="a"):
         ele = self.wait_for_element(self.EMPLOYEE_NAME_INPUT)
+        
+        ele.send_keys(Keys.CONTROL + "a")
+        ele.send_keys(Keys.BACKSPACE)
+        time.sleep(1)
+        
         ele.send_keys(name_hint)
-        time.sleep(2) 
+        time.sleep(2)
+        
         self.wait_for_clickable(self.EMPLOYEE_SUGGESTION).click()
 
     def select_leave_type(self):
@@ -73,7 +87,6 @@ class LeavePage(BasePage):
         time.sleep(1)
 
     def _enter_date(self, locator, date_str):
-        """Fungsi pembantu internal untuk menghapus dan mengisi tanggal"""
         ele = self.wait_for_element(locator)
         ele.send_keys(Keys.CONTROL + "a")
         ele.send_keys(Keys.BACKSPACE)
@@ -89,40 +102,30 @@ class LeavePage(BasePage):
     def enter_comment(self, comment_text):
         self.wait_for_element(self.COMMENT_INPUT).send_keys(comment_text)
 
+    # --- ACTIONS (TOMBOL FORM) ---
     def click_assign_button(self):
         self.wait_for_clickable(self.ASSIGN_BUTTON).click()
+
+    def click_apply_button(self):
+        self.wait_for_clickable(self.APPLY_BUTTON).click()
+
+    def click_search_button(self):
+        self.wait_for_clickable(self.SEARCH_BUTTON).click()
 
     def select_status_pending_approval(self):
         self.wait_for_clickable(self.STATUS_DROPDOWN).click()
         self.wait_for_clickable(self.PENDING_APPROVAL_OPTION).click()
         self.force_unfocus()
 
-    def click_search_button(self):
-        self.wait_for_clickable(self.SEARCH_BUTTON).click()
-
-    def _handle_popup(self, locator, timeout=3):
-        """Fungsi pembantu untuk menangani berbagai pop-up konfirmasi"""
-        try:
-            wait_short = WebDriverWait(self.driver, timeout)
-            wait_short.until(EC.element_to_be_clickable(locator)).click()
-        except TimeoutException:
-            pass
-
-    def handle_insufficient_balance_popup(self):
-        self._handle_popup(self.CONFIRM_OK_BUTTON)
-
-    def confirm_entitlement_if_needed(self):
-        self._handle_popup(self.CONFIRM_ENTITLEMENT_BUTTON)
-    
-    def force_unfocus(self):
-        try:
-            self.driver.find_element(By.XPATH, "//h6[contains(@class, 'oxd-topbar-header-breadcrumb-module')]").click()
-        except:
-            pass
-
+    # --- ACTIONS (ENTITLEMENTS & CANCEL) ---
     def click_add_entitlements_menu(self):
         self.wait_for_clickable(self.ENTITLEMENTS_MENU).click()
         self.wait_for_clickable(self.ADD_ENTITLEMENTS_SUBMENU).click()
+        time.sleep(1)
+
+    def click_employee_entitlements_menu(self):
+        self.wait_for_clickable(self.ENTITLEMENTS_MENU).click()
+        self.wait_for_clickable(self.EMPLOYEE_ENTITLEMENTS_SUBMENU).click()
         time.sleep(1)
 
     def enter_entitlement_amount(self, amount):
@@ -134,60 +137,70 @@ class LeavePage(BasePage):
     def click_save_button(self):
         self.wait_for_clickable(self.SAVE_BUTTON).click()
 
-    def click_confirm_ok_popup_strict(self):
-        """Mengklik tombol Ok pada pop-up. Tanpa try-except agar test gagal jika pop-up tidak muncul."""
-        self.wait_for_clickable(self.CONFIRM_OK_BUTTON).click()
-
-    def click_apply_tab(self):
-        self.wait_for_clickable(self.APPLY_TAB).click()
-        time.sleep(1)
-
-    def click_apply_button(self):
-        self.wait_for_clickable(self.APPLY_BUTTON).click()
-
-    def click_my_leave_tab(self):
-        self.wait_for_clickable(self.MY_LEAVE_TAB).click()
-        time.sleep(1)
-
     def cancel_all_my_leaves(self):
         """Membatalkan seluruh permohonan cuti yang masih bisa di-cancel"""
         while True:
             try:
-                # Menggunakan timeout pendek agar pengujian cepat berlanjut jika tombol tidak ada
                 wait_short = WebDriverWait(self.driver, 3)
                 cancel_btn = wait_short.until(EC.element_to_be_clickable(self.CANCEL_BUTTON))
                 cancel_btn.click()
-                time.sleep(2) # Memberi jeda waktu proses pembatalan/toast info
+                time.sleep(2) 
             except TimeoutException:
                 break
 
-    def click_employee_entitlements_menu(self):
-        self.wait_for_clickable(self.ENTITLEMENTS_MENU).click()
-        self.wait_for_clickable(self.EMPLOYEE_ENTITLEMENTS_SUBMENU).click()
-        time.sleep(1)
-
     def delete_all_employee_entitlements(self):
-        """Menghapus massal menggunakan master checkbox"""
+        no_records = self.driver.find_elements(By.XPATH, "//span[text()='No Records Found']")
+        if len(no_records) > 0:
+            return
+
         try:
-            wait_short = WebDriverWait(self.driver, 3)
+            wait = WebDriverWait(self.driver, 5)
             
-            # 1. Klik Master Checkbox di Header Tabel
-            master_cb = wait_short.until(EC.element_to_be_clickable(self.CHECKBOX_MASTER))
+            try:
+                wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "oxd-toast-container")))
+            except TimeoutException:
+                pass
+            
+            master_cb = wait.until(EC.presence_of_element_located(self.CHECKBOX_MASTER))
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", master_cb)
+            time.sleep(1)
+            
             master_cb.click()
-            time.sleep(1) # Tunggu tombol Delete Selected muncul
+            time.sleep(1) 
             
-            # 2. Klik Delete Selected
-            del_selected = wait_short.until(EC.element_to_be_clickable(self.DELETE_SELECTED_BUTTON))
+            del_selected = wait.until(EC.element_to_be_clickable(self.DELETE_SELECTED_BUTTON))
             del_selected.click()
             time.sleep(1)
             
-            # 3. Konfirmasi
-            confirm_del = wait_short.until(EC.element_to_be_clickable(self.CONFIRM_DELETE_BUTTON))
+            confirm_del = wait.until(EC.element_to_be_clickable(self.CONFIRM_DELETE_BUTTON))
             confirm_del.click()
             time.sleep(2)
             
+        except (TimeoutException, ElementClickInterceptedException) as e:
+            pass
+
+    # --- HELPER & POPUPS ---
+    def _handle_popup(self, locator, timeout=3):
+        """Fungsi pembantu untuk menangani pop-up jika ada"""
+        try:
+            wait_short = WebDriverWait(self.driver, timeout)
+            wait_short.until(EC.element_to_be_clickable(locator)).click()
         except TimeoutException:
-            # Masuk ke sini jika tabel kosong (Master Checkbox tidak ada)
+            pass
+
+    def handle_insufficient_balance_popup(self):
+        self._handle_popup(self.CONFIRM_OK_BUTTON)
+
+    def confirm_entitlement_if_needed(self):
+        self._handle_popup(self.CONFIRM_ENTITLEMENT_BUTTON)
+
+    def click_confirm_ok_popup_strict(self):
+        self.wait_for_clickable(self.CONFIRM_OK_BUTTON).click()
+    
+    def force_unfocus(self):
+        try:
+            self.driver.find_element(By.XPATH, "//h6[contains(@class, 'oxd-topbar-header-breadcrumb-module')]").click()
+        except:
             pass
 
     # --- ASSERTIONS / GETTERS ---

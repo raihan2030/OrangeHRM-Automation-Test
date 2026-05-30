@@ -2,6 +2,7 @@ import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
 from pages.base_page import BasePage
 
 class PIMPage(BasePage):
@@ -56,7 +57,13 @@ class PIMPage(BasePage):
         file_input.send_keys(file_path)
 
     def click_save_button(self):
-        self.wait_for_clickable(self.SAVE_BUTTON).click()
+        try:
+            self.wait.until(EC.invisibility_of_element_located((By.CLASS_NAME, "oxd-form-loader")))
+        except TimeoutException:
+            pass
+            
+        btn = self.wait_for_clickable(self.SAVE_BUTTON)
+        self.driver.execute_script("arguments[0].click();", btn)
 
     def search_by_employee_id(self, emp_id):
         self.wait_for_element(self.EMPLOYEE_ID_SEARCH_INPUT).send_keys(emp_id)
@@ -65,7 +72,7 @@ class PIMPage(BasePage):
     def search_by_employee_name(self, name):
         emp_input = self.wait_for_element(self.EMPLOYEE_NAME_SEARCH_INPUT)
         emp_input.send_keys(name)
-        time.sleep(2) # Tunggu saran nama muncul
+        time.sleep(2)
         self.wait_for_clickable(self.AUTOCOMPLETE_FIRST_OPTION).click()
         self.wait_for_clickable(self.SEARCH_BUTTON).click()
 
