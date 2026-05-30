@@ -9,6 +9,7 @@ class DashboardPage(BasePage):
     USER_DROPDOWN = (By.XPATH, "//i[contains(@class, 'oxd-userdropdown-icon')]")
     LOGOUT_LINK = (By.XPATH, "//a[text()='Logout']")
     PIM_MENU = (By.XPATH, "//span[text()='PIM']")
+    LEAVE_MENU = (By.XPATH, "//span[text()='Leave']")
 
     # --- ACTIONS & GETTERS ---
     def get_dashboard_header(self):
@@ -26,3 +27,6 @@ class DashboardPage(BasePage):
     
     def click_pim_menu(self):
         self.wait_for_clickable(self.PIM_MENU).click()
+    
+    def click_leave_menu(self):
+        self.wait_for_clickable(self.LEAVE_MENU).click()
