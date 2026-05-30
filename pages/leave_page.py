@@ -52,7 +52,7 @@ class LeavePage(BasePage):
     REQUIRED_ERROR_MSG = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message') and text()='Required']")
 
     # Tombol silang 'x' pada chip status 'Pending Approval' di Leave List
-    REMOVE_PENDING_CHIP = (By.XPATH, "//span[contains(text(), 'Pending Approval')]/following-sibling::i[contains(@class, 'oxd-chip-close')]")
+    REMOVE_PENDING_CHIP = (By.XPATH, "//label[text()='Show Leave with Status']/../following-sibling::div//i[contains(@class, 'bi-x') and contains(@class, '--clear')]")
 
     # Navigasi Menu Configure & Leave Types
     CONFIGURE_MENU = (By.XPATH, "//span[normalize-space()='Configure']")
@@ -245,3 +245,14 @@ class LeavePage(BasePage):
     
     def is_required_error_displayed(self):
         return self.wait_for_element(self.REQUIRED_ERROR_MSG).is_displayed()
+
+    def is_leave_search_result_valid(self):
+        try:
+            wait = WebDriverWait(self.driver, 5)
+            wait.until(lambda d: 
+                len(d.find_elements(By.XPATH, "//span[normalize-space()='No Records Found']")) > 0 or 
+                len(d.find_elements(By.XPATH, "//div[contains(@class, 'oxd-table-card')]")) > 0
+            )
+            return True
+        except TimeoutException:
+            return False

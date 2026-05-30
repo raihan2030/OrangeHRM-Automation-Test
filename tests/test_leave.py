@@ -175,7 +175,8 @@ class TestLeave(unittest.TestCase):
         self.leave_page.click_leave_list_tab()
         self.leave_page.select_status_pending_approval()
         self.leave_page.click_search_button()
-        time.sleep(2)
+        
+        self.assertTrue(self.leave_page.is_leave_search_result_valid())
     
     def test_13_add_leave_type_success(self):
         self.leave_page.navigate_to_leave_types()
