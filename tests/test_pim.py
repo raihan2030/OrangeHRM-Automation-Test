@@ -87,6 +87,9 @@ class TestPIM(unittest.TestCase):
         
         self.pim_page.upload_photo(self.valid_image_path)
         
+        unique_id = f"ID{int(time.time())}"[-8:] 
+        self.pim_page.enter_employee_id_add(unique_id)
+        
         self.pim_page.click_save_button()
         self.assertTrue(self.pim_page.is_success_toast_displayed())
 
