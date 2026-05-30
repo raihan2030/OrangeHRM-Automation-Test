@@ -6,7 +6,7 @@ from pages.dashboard_page import DashboardPage
 class TestAuth(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Edge()
         self.driver.maximize_window()
         self.driver.get("https://opensource-demo.orangehrmlive.com/")
         

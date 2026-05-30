@@ -25,7 +25,7 @@ class TestMyInfo(unittest.TestCase):
                 os.remove(file)
 
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Edge()
         self.driver.maximize_window()
         self.driver.get("https://opensource-demo.orangehrmlive.com/")
         
