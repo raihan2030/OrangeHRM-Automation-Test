@@ -132,7 +132,7 @@ class TestLeave(unittest.TestCase):
     # --- HELPER METHODS ---
     
     def get_date(self, days_offset=0):
-        return (datetime.now() + timedelta(days=days_offset)).strftime("%Y-%m-%d")
+        return (datetime.now() + timedelta(days=days_offset)).strftime("%Y-%d-%m")
 
     def fill_assign_leave(self, from_offset, to_offset, comment=""):
         self.leave_page.click_assign_leave_tab()
