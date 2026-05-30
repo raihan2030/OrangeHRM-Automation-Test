@@ -21,7 +21,7 @@ class TestPIM(unittest.TestCase):
         with open(cls.large_image_path, "wb") as f: f.write(os.urandom(2 * 1024 * 1024))
 
         # --- SETUP PRASYARAT: Pastikan Employee ID 0024 ada ---
-        driver = webdriver.Chrome()
+        driver = webdriver.Edge()
         driver.maximize_window()
         driver.get("https://opensource-demo.orangehrmlive.com/")
         
@@ -33,7 +33,7 @@ class TestPIM(unittest.TestCase):
         dashboard_page.click_pim_menu()
         
         pim_page.search_by_employee_id("0024")
-        time.sleep(2)
+        time.sleep(5)
         
         no_records = driver.find_elements(By.XPATH, "//span[text()='No Records Found']")
         if len(no_records) > 0:
@@ -53,7 +53,7 @@ class TestPIM(unittest.TestCase):
                 os.remove(file)
 
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Edge()
         self.driver.maximize_window()
         self.driver.get("https://opensource-demo.orangehrmlive.com/")
         
@@ -91,14 +91,33 @@ class TestPIM(unittest.TestCase):
         self.assertTrue(self.pim_page.is_success_toast_displayed())
 
     def test_03_search_employee_by_id(self):
-        self.pim_page.search_by_employee_id("0024") 
-        time.sleep(2)
-        pass 
+        search_id = "0024"
+        self.pim_page.search_by_employee_id(search_id) 
+        time.sleep(2) 
+        
+        record_count = self.pim_page.get_search_results_count()
+        
+        if record_count > 0:
+            emp_id = self.pim_page.get_first_record_column_text(2)
+            self.assertEqual(emp_id, search_id)
+        else:
+            self.assertTrue(self.pim_page.is_no_records_found_displayed())
 
     def test_04_search_employee_by_name(self):
-        self.pim_page.search_by_employee_name("a")
+        search_name = "a"
+        self.pim_page.search_by_employee_name(search_name)
         time.sleep(2)
-        pass
+        
+        record_count = self.pim_page.get_search_results_count()
+        
+        if record_count > 0:
+            first_name = self.pim_page.get_first_record_column_text(3).lower()
+            last_name = self.pim_page.get_first_record_column_text(4).lower()
+            
+            is_name_match = search_name in first_name or search_name in last_name
+            self.assertTrue(is_name_match)
+        else:
+            self.assertTrue(self.pim_page.is_no_records_found_displayed())
 
     def test_05_delete_employee(self):
         self.pim_page.delete_first_record()

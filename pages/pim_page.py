@@ -25,6 +25,8 @@ class PIMPage(BasePage):
     AUTOCOMPLETE_FIRST_OPTION = (By.XPATH, "//div[@role='listbox']//span")
     
     # Locators Tabel & Hapus
+    TABLE_RECORDS = (By.XPATH, "//div[contains(@class, 'oxd-table-body')]//div[contains(@class, 'oxd-table-card')]")
+    NO_RECORDS_MSG = (By.XPATH, "//span[text()='No Records Found']")
     FIRST_TRASH_ICON = (By.XPATH, "(//i[contains(@class, 'bi-trash')])[1]")
     CONFIRM_DELETE_BUTTON = (By.XPATH, "//button[normalize-space()='Yes, Delete']")
     
@@ -34,6 +36,7 @@ class PIMPage(BasePage):
     LAST_NAME_ERROR = (By.XPATH, "//input[@name='lastName']/parent::div/following-sibling::span[contains(@class, 'oxd-input-field-error-message')]")
     EMPLOYEE_ID_ERROR = (By.XPATH, "//label[text()='Employee Id']/ancestor::div[contains(@class, 'oxd-input-group')]//span[contains(@class, 'oxd-input-field-error-message')]")
     FILE_ERROR = (By.XPATH, "//span[contains(@class, 'oxd-input-field-error-message')]")
+
 
     # --- ACTIONS ---
     def click_add_button(self):
@@ -95,3 +98,15 @@ class PIMPage(BasePage):
         
     def get_file_error_message(self):
         return self.wait_for_element(self.FILE_ERROR).text
+    
+    def get_search_results_count(self):
+        # Mengembalikan jumlah data yang ditemukan
+        records = self.driver.find_elements(*self.TABLE_RECORDS)
+        return len(records)
+
+    def get_first_record_column_text(self, col_index):
+        dynamic_xpath = f"(//div[contains(@class, 'oxd-table-card')])[1]//div[@role='cell'][{col_index}]/div"
+        return self.wait_for_element((By.XPATH, dynamic_xpath)).text
+
+    def is_no_records_found_displayed(self):
+        return self.wait_for_element(self.NO_RECORDS_MSG).is_displayed()
